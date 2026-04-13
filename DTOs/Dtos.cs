@@ -2,9 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SocialMediaAPI.DTOs
 {
-    // ════════════════════════════════════════
-    //  COMMON
-    // ════════════════════════════════════════
     public class ApiResponse<T>
     {
         public bool Success { get; set; }
@@ -37,16 +34,13 @@ namespace SocialMediaAPI.DTOs
         public int PageSize
         {
             get => _pageSize;
-            set => _pageSize = value > 50 ? 50 : value; // max 50 per page
+            set => _pageSize = value > 50 ? 50 : value; 
         }
         public string? Search { get; set; }
         public string SortBy { get; set; } = "createdAt";
-        public string SortOrder { get; set; } = "desc"; // asc | desc
+        public string SortOrder { get; set; } = "desc"; 
     }
 
-    // ════════════════════════════════════════
-    //  AUTH
-    // ════════════════════════════════════════
     public class RegisterRequestDto
     {
         [Required] [StringLength(100)] public string FullName { get; set; } = string.Empty;
@@ -76,9 +70,6 @@ namespace SocialMediaAPI.DTOs
         public UserSummaryDto User { get; set; } = null!;
     }
 
-    // ════════════════════════════════════════
-    //  USER
-    // ════════════════════════════════════════
     public class UserSummaryDto
     {
         public string Id { get; set; } = string.Empty;
@@ -108,9 +99,6 @@ namespace SocialMediaAPI.DTOs
         public string? ProfilePictureUrl { get; set; }
     }
 
-    // ════════════════════════════════════════
-    //  POST
-    // ════════════════════════════════════════
     public class CreatePostDto
     {
         [Required] [StringLength(2000, MinimumLength = 1)] public string Content { get; set; } = string.Empty;
@@ -136,9 +124,6 @@ namespace SocialMediaAPI.DTOs
         public bool IsLikedByCurrentUser { get; set; }
     }
 
-    // ════════════════════════════════════════
-    //  COMMENT
-    // ════════════════════════════════════════
     public class CreateCommentDto
     {
         [Required] [StringLength(1000, MinimumLength = 1)] public string Content { get; set; } = string.Empty;

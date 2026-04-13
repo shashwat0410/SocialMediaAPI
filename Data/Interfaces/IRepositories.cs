@@ -3,7 +3,6 @@ using SocialMediaAPI.Models;
 
 namespace SocialMediaAPI.Data.Interfaces
 {
-    // ── Generic Repository ─────────────────────────────────────
     public interface IRepository<T> where T : class
     {
         Task<T?> GetByIdAsync(int id);
@@ -13,7 +12,6 @@ namespace SocialMediaAPI.Data.Interfaces
         void Delete(T entity);
     }
 
-    // ── Post Repository ────────────────────────────────────────
     public interface IPostRepository : IRepository<Post>
     {
         Task<PagedResult<Post>> GetPostsAsync(PaginationParams pagination, string? currentUserId = null);
@@ -23,21 +21,18 @@ namespace SocialMediaAPI.Data.Interfaces
         Task<bool> IsLikedByUserAsync(int postId, string userId);
     }
 
-    // ── Comment Repository ─────────────────────────────────────
     public interface ICommentRepository : IRepository<Comment>
     {
         Task<PagedResult<Comment>> GetPostCommentsAsync(int postId, PaginationParams pagination);
         Task<Comment?> GetCommentWithRepliesAsync(int commentId);
     }
 
-    // ── Like Repository ────────────────────────────────────────
     public interface ILikeRepository : IRepository<Like>
     {
         Task<Like?> GetLikeAsync(int postId, string userId);
         Task<int> GetLikesCountAsync(int postId);
     }
 
-    // ── Follow Repository ──────────────────────────────────────
     public interface IFollowRepository : IRepository<Follow>
     {
         Task<Follow?> GetFollowAsync(string followerId, string followingId);
@@ -48,7 +43,6 @@ namespace SocialMediaAPI.Data.Interfaces
         Task<int> GetFollowingCountAsync(string userId);
     }
 
-    // ── User Repository ────────────────────────────────────────
     public interface IUserRepository
     {
         Task<ApplicationUser?> GetByIdAsync(string id);
@@ -57,7 +51,6 @@ namespace SocialMediaAPI.Data.Interfaces
         Task<bool> UpdateAsync(ApplicationUser user);
     }
 
-    // ── Refresh Token Repository ───────────────────────────────
     public interface IRefreshTokenRepository
     {
         Task<RefreshToken?> GetByTokenAsync(string token);
@@ -66,7 +59,6 @@ namespace SocialMediaAPI.Data.Interfaces
         Task RevokeAllUserTokensAsync(string userId);
     }
 
-    // ── Unit of Work ───────────────────────────────────────────
     public interface IUnitOfWork : IDisposable
     {
         IPostRepository Posts { get; }

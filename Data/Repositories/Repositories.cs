@@ -5,7 +5,6 @@ using SocialMediaAPI.Models;
 
 namespace SocialMediaAPI.Data.Repositories
 {
-    // ── Generic Repository ─────────────────────────────────────
     public class Repository<T> : IRepository<T> where T : class
     {
         protected readonly ApplicationDbContext _context;
@@ -24,7 +23,6 @@ namespace SocialMediaAPI.Data.Repositories
         public void Delete(T entity) => _dbSet.Remove(entity);
     }
 
-    // ── Post Repository ────────────────────────────────────────
     public class PostRepository : Repository<Post>, IPostRepository
     {
         public PostRepository(ApplicationDbContext context) : base(context) { }
@@ -70,7 +68,6 @@ namespace SocialMediaAPI.Data.Repositories
 
         public async Task<PagedResult<Post>> GetFeedAsync(string userId, PaginationParams p)
         {
-            // Feed = posts from users you follow + your own posts
             var followingIds = await _context.Follows
                 .Where(f => f.FollowerId == userId)
                 .Select(f => f.FollowingId)
@@ -105,7 +102,6 @@ namespace SocialMediaAPI.Data.Repositories
             await _context.Likes.AnyAsync(l => l.PostId == postId && l.UserId == userId);
     }
 
-    // ── Comment Repository ─────────────────────────────────────
     public class CommentRepository : Repository<Comment>, ICommentRepository
     {
         public CommentRepository(ApplicationDbContext context) : base(context) { }
@@ -131,7 +127,6 @@ namespace SocialMediaAPI.Data.Repositories
                 .FirstOrDefaultAsync(c => c.Id == commentId);
     }
 
-    // ── Like Repository ────────────────────────────────────────
     public class LikeRepository : Repository<Like>, ILikeRepository
     {
         public LikeRepository(ApplicationDbContext context) : base(context) { }
@@ -143,7 +138,6 @@ namespace SocialMediaAPI.Data.Repositories
             await _context.Likes.CountAsync(l => l.PostId == postId);
     }
 
-    // ── Follow Repository ──────────────────────────────────────
     public class FollowRepository : Repository<Follow>, IFollowRepository
     {
         public FollowRepository(ApplicationDbContext context) : base(context) { }
@@ -187,7 +181,6 @@ namespace SocialMediaAPI.Data.Repositories
             await _context.Follows.CountAsync(f => f.FollowerId == userId);
     }
 
-    // ── User Repository ────────────────────────────────────────
     public class UserRepository : IUserRepository
     {
         private readonly ApplicationDbContext _context;
@@ -221,7 +214,6 @@ namespace SocialMediaAPI.Data.Repositories
         }
     }
 
-    // ── Refresh Token Repository ───────────────────────────────
     public class RefreshTokenRepository : IRefreshTokenRepository
     {
         private readonly ApplicationDbContext _context;
@@ -259,7 +251,6 @@ namespace SocialMediaAPI.Data.Repositories
         }
     }
 
-    // ── Unit of Work ───────────────────────────────────────────
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;

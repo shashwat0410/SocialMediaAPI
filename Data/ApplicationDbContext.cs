@@ -19,7 +19,6 @@ namespace SocialMediaAPI.Data
         {
             base.OnModelCreating(builder);
 
-            // ── Post ───────────────────────────────────────────
             builder.Entity<Post>(e =>
             {
                 e.HasOne(p => p.User)
@@ -32,7 +31,6 @@ namespace SocialMediaAPI.Data
                 e.HasIndex(p => p.CreatedAt);
             });
 
-            // ── Comment ────────────────────────────────────────
             builder.Entity<Comment>(e =>
             {
                 e.HasOne(c => c.Post)
@@ -53,7 +51,6 @@ namespace SocialMediaAPI.Data
                 e.HasQueryFilter(c => !c.IsDeleted);
             });
 
-            // ── Like ───────────────────────────────────────────
             builder.Entity<Like>(e =>
             {
                 e.HasOne(l => l.Post)
@@ -66,11 +63,9 @@ namespace SocialMediaAPI.Data
                  .HasForeignKey(l => l.UserId)
                  .OnDelete(DeleteBehavior.NoAction);
 
-                // Unique: one like per user per post
                 e.HasIndex(l => new { l.UserId, l.PostId }).IsUnique();
             });
 
-            // ── Follow ─────────────────────────────────────────
             builder.Entity<Follow>(e =>
             {
                 e.HasOne(f => f.Follower)
@@ -83,11 +78,9 @@ namespace SocialMediaAPI.Data
                  .HasForeignKey(f => f.FollowingId)
                  .OnDelete(DeleteBehavior.NoAction);
 
-                // Unique: can't follow same person twice
                 e.HasIndex(f => new { f.FollowerId, f.FollowingId }).IsUnique();
             });
 
-            // ── RefreshToken ───────────────────────────────────
             builder.Entity<RefreshToken>(e =>
             {
                 e.HasOne(r => r.User)

@@ -13,7 +13,6 @@ using SocialMediaAPI.Models;
 using SocialMediaAPI.Services;
 using System.Text;
 
-// ── Serilog Bootstrap ────────────────────────────────────────
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("logs/app-.log", rollingInterval: RollingInterval.Day)
@@ -22,16 +21,13 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
 
-// ── JWT Settings ─────────────────────────────────────────────
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()
     ?? throw new InvalidOperationException("JwtSettings not configured.");
 builder.Services.AddSingleton(jwtSettings);
 
-// ── Database ──────────────────────────────────────────────────
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ── Identity ─────────────────────────────────────────────────
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -45,7 +41,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// ── JWT Authentication ────────────────────────────────────────
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -62,7 +57,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer              = jwtSettings.Issuer,
         ValidAudience            = jwtSettings.Audience,
         IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
-        ClockSkew                = TimeSpan.Zero // no tolerance for expired tokens
+        ClockSkew                = TimeSpan.Zero 
     };
 
     options.Events = new JwtBearerEvents
@@ -77,7 +72,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// ── Application Services ──────────────────────────────────────
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -85,10 +79,8 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-// ── Controllers ───────────────────────────────────────────────
 builder.Services.AddControllers();
 
-// ── Swagger ───────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -100,7 +92,6 @@ builder.Services.AddSwaggerGen(options =>
         Contact     = new OpenApiContact { Name = "Your Name", Email = "you@example.com" }
     });
 
-    // JWT Bearer in Swagger UI
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name         = "Authorization",
@@ -122,13 +113,11 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 
-    // Use XML comments for Swagger descriptions
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath)) options.IncludeXmlComments(xmlPath);
 });
 
-// ── CORS ──────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -137,10 +126,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// ── Middleware Pipeline ───────────────────────────────────────
-app.UseGlobalExceptionHandler();  // Global error handling FIRST
+app.UseGlobalExceptionHandler();  
 
-app.UseSerilogRequestLogging();   // Log every HTTP request
+app.UseSerilogRequestLogging();  
 
 if (app.Environment.IsDevelopment())
 {
@@ -148,7 +136,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "SocialMedia API v1");
-        c.RoutePrefix = string.Empty; // Swagger at root "/"
+        c.RoutePrefix = string.Empty; 
         c.DisplayRequestDuration();
         c.EnableDeepLinking();
     });
@@ -160,7 +148,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// ── Seed Roles ────────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -169,14 +156,12 @@ using (var scope = app.Services.CreateScope())
 
     context.Database.EnsureCreated();
 
-    // Create roles
     foreach (var role in new[] { "Admin", "User" })
     {
         if (!await roleManager.RoleExistsAsync(role))
             await roleManager.CreateAsync(new IdentityRole(role));
     }
 
-    // Seed default admin account
     const string adminEmail = "admin@socialmedia.com";
     if (await userManager.FindByEmailAsync(adminEmail) == null)
     {

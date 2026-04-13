@@ -52,7 +52,6 @@ namespace SocialMediaAPI.Middleware
         }
     }
 
-    // Extension method for clean registration
     public static class MiddlewareExtensions
     {
         public static IApplicationBuilder UseGlobalExceptionHandler(this IApplicationBuilder app)
